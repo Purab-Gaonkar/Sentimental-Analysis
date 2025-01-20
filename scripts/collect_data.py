@@ -3,7 +3,7 @@ import emoji
 from googleapiclient.discovery import build
 from urllib.parse import urlparse, parse_qs
 
-API_KEY = 'AIzaSyBtJjniAVMDaQN3OaocZpP7MyAVBgXPl2Q'  # Put in your API Key
+API_KEY = 'xxx'  # Put in your API Key
 
 youtube = build('youtube', 'v3', developerKey=API_KEY)  # Initializing Youtube API
 
