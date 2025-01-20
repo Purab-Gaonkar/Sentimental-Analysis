@@ -3,7 +3,7 @@ import emoji
 from googleapiclient.discovery import build
 from urllib.parse import urlparse, parse_qs
 
-API_KEY = 'xxx'  # Put in your API Key
+API_KEY = 'AIzaSyBtJjniAVMDaQN3OaocZpP7MyAVBgXPl2Q'  # Put in your API Key
 
 youtube = build('youtube', 'v3', developerKey=API_KEY)  # Initializing Youtube API
 
@@ -114,8 +114,8 @@ print("First 5 relevant comments:")
 for i, comment in enumerate(relevant_comments[:5], start=1):
     print(f"{i}: {comment}")
 
-# Write relevant comments to a file
-with open("data/raw/ytcomments.txt", 'w', encoding='utf-8') as f:
+# Write relevant comments to a file in write mode (this will overwrite the file)
+with open("data/raw/ytcomments.txt", 'w', encoding='utf-8') as f:  # Changed 'a' to 'w'
     for idx, comment in enumerate(relevant_comments):
         f.write(str(comment) + "\n")
 
