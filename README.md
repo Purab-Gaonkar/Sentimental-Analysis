@@ -22,3 +22,65 @@ sentiment_analysis_project/
 │   └── app.py                     # Flask app for deploying the model
 ├── requirements.txt               # List of project dependencies
 └── README.md                      # Project documentation
+
+
+## Setup Instructions
+
+1. **Clone the repository:**
+    ```sh
+    git clone <repository-url>
+    cd sentiment_analysis_project
+    ```
+
+2. **Install dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+3. **Collect YouTube comments:**
+    ```sh
+    python scripts/collect_data.py
+    ```
+
+4. **Preprocess data:**
+    ```sh
+    python scripts/preprocess_data.py
+    ```
+
+5. **Train the model:**
+    ```sh
+    python scripts/train_model.py
+    ```
+
+6. **Run the Flask app:**
+    ```sh
+    python app/app.py
+    ```
+
+## Usage
+
+- **Collect YouTube comments using `collect_data.py`:**
+    ```sh
+    python scripts/collect_data.py
+    ```
+
+- **Preprocess comments data using `preprocess_data.py`:**
+    ```sh
+    python scripts/preprocess_data.py
+    ```
+
+- **Train the sentiment analysis model using `train_model.py`:**
+    ```sh
+    python scripts/train_model.py
+    ```
+
+- **Deploy the model as an API using `app.py`:**
+    ```sh
+    python app/app.py
+    ```
+
+## API Endpoint
+
+- **`/analyze` (POST):** Analyze sentiment of the given text.
+    - Request body: `{ "text": "Sample comment" }`
+    - Response: `{ "sentiment": 2, "probability": 0.98 }`
