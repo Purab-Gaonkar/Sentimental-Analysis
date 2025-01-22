@@ -1,5 +1,5 @@
 import torch
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, Trainer, TrainingArguments
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, Trainer, TrainingArguments, default_data_collator
 from datasets import Dataset
 from evaluate import load
 import numpy as np
@@ -37,29 +37,41 @@ model = model.to(device)
 
 # Function to preprocess the data
 def preprocess_function(examples):
-    # Here, we assume that 'label' is already present in the dataset
-    return tokenizer(examples['comment'], truncation=True, padding=True)
+    # Tokenize the comments using the tokenizer
+    tokenized_inputs = tokenizer(examples['comment'], padding='max_length', truncation=True, max_length=512)
+    # Ensure the labels are added to the tokenized inputs
+    tokenized_inputs['labels'] = examples['labels']
+    return tokenized_inputs
 
 # Read comments from the file
 if os.path.exists("data/processed/sentiment_data.csv"):
     dataset = pd.read_csv("data/processed/sentiment_data.csv")
 
-    # Check if 'sentiment_label' column exists, rename to 'labels' if it does
+    # Ensure the 'sentiment_label' column exists and is renamed to 'labels' for compatibility
     if 'sentiment_label' in dataset.columns:
         dataset = dataset.rename(columns={"sentiment_label": "labels"})
     else:
         raise ValueError("The dataset does not have 'sentiment_label' column. Ensure your data is labeled.")
 
+    # If the 'labels' are categorical strings, encode them as integers
+    if dataset['labels'].dtype == 'object':
+        dataset['labels'] = dataset['labels'].astype('category').cat.codes
+
     # Convert the pandas DataFrame to a Hugging Face Dataset object
     dataset = Dataset.from_pandas(dataset)
+    
+    # Preprocess the dataset by tokenizing the comments
     tokenized_dataset = dataset.map(preprocess_function, batched=True)
 else:
     raise FileNotFoundError("Dataset file not found: data/processed/sentiment_data.csv")
 
-# Split dataset into training and evaluation sets
+# Split dataset into training and evaluation sets (80% train, 20% test)
 train_test_split = tokenized_dataset.train_test_split(test_size=0.2)
 train_dataset = train_test_split['train']
 eval_dataset = train_test_split['test']
+
+# Use default data collator (handles padding dynamically)
+data_collator = default_data_collator
 
 # Training arguments
 training_args = TrainingArguments(
@@ -78,24 +90,26 @@ training_args = TrainingArguments(
     no_cuda=False  # Ensure the GPU is used if available
 )
 
-# Load metric
+# Load accuracy metric for evaluation
 metric = load('accuracy')
 
+# Compute accuracy metrics
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
     return metric.compute(predictions=predictions, references=labels)
 
-# Trainer
+# Trainer setup
 trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
-    compute_metrics=compute_metrics
+    compute_metrics=compute_metrics,
+    data_collator=data_collator  # Use the default data collator
 )
 
-# Train the model
+# Start training the model
 trainer.train()
 
 # Save the trained model and tokenizer

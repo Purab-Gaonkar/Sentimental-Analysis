@@ -115,7 +115,7 @@ for i, comment in enumerate(relevant_comments[:5], start=1):
     print(f"{i}: {comment}")
 
 # Write relevant comments to a file in write mode (this will overwrite the file)
-with open("data/raw/ytcomments.txt", 'w', encoding='utf-8') as f:  # Changed 'a' to 'w'
+with open("data/raw/ytcomments.txt", 'a', encoding='utf-8') as f:  # Changed 'a' to 'w'
     for idx, comment in enumerate(relevant_comments):
         f.write(str(comment) + "\n")
 

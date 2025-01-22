@@ -39,7 +39,7 @@ with open("data/raw/ytcomments.txt", 'r', encoding='utf-8') as f:
     comments = f.readlines()
 
 # Preprocess comments and write to CSV
-with open("data/processed/sentiment_data.csv", 'w', newline='', encoding='utf-8') as csvfile:
+with open("data/processed/sentiment_data.csv", 'a', newline='', encoding='utf-8') as csvfile:
     fieldnames = ['comment', 'sentiment_label']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
